@@ -1,0 +1,70 @@
+import React, {useEffect, useRef} from 'react';
+// import setupGoogleServices from '../assets/googleServices';
+
+export default function Map({ options, onMount, className }) {
+  const ref = useRef()
+
+  // const title = <h1>{props.title}</h1>;
+
+  // const createGoogleMap = () =>
+  //   new window.google.maps.Map(googleMapRef.current, props.mapOptions)
+
+  //   const createMarker = (googleMap) => 
+  //     new window.google.maps.Marker({
+  //       position: props.userPosition,
+  //       map: googleMap
+  //     });
+
+    useEffect(() => {
+      const onLoad = () => {
+        if (typeof onMount === `function`) {
+          const map = new window.google.maps.Map(ref.current, options)
+          onMount(map)
+        }
+      }
+
+      if (!window.google) {
+        const googleMapScript = document.createElement('script')
+        googleMapScript.type = `text/javascript`
+        googleMapScript.src = `https://maps.googleapis.com/maps/api/js?&libraries=places&key=${process.env.REACT_APP_GOOGLE_KEY}`
+        const headScript = document.getElementsByTagName(`script`)[0]
+        headScript.parentNode.insertBefore(googleMapScript, headScript)
+        googleMapScript.addEventListener("load", onLoad)
+        return () => googleMapScript.removeEventListener(`load`, onLoad)
+      } else onLoad()
+    }, [onMount, options])
+      //   () => {
+      //     let googleMap = createGoogleMap();
+      //     let marker = createMarker(googleMap)
+      //   })     
+      // }
+
+     // if (typeof window.google === 'undefined') {
+        // window.document.body.appendChild(googleMapScript)
+      // } else {
+        // console.log("window.google already created");
+      // }
+
+    return (
+        <div
+          css="height: 60vh; margin: 1em 0; border-radius: 0.5em;"
+          {...{ ref, className }}
+        />
+    )
+}
+
+Map.defaultProps = {
+  options: {
+    center: { lat: 48, lng: 8 },
+    zoom: 5,
+  },
+}
+
+/*
+            <div
+                id="google-map"
+                ref={googleMapRef}
+                style={{ width: '100%', height: '400px' }}
+                {...{ ref, className }}
+             />
+*/
