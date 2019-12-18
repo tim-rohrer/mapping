@@ -1,17 +1,16 @@
 import React, { useEffect, useRef } from 'react'
 
 export default function Map({ options, onMount, className }) {
+  // debugger
   const ref = useRef()
 
   useEffect(() => {
 
     const onLoad = () => {
       const map = new window.google.maps.Map(ref.current, options)
-
       if (typeof onMount === 'function') {
         // debugger
         onMount(map)
-        // addMarkers(links)(map);
       }
     }
     if (!window.google) {

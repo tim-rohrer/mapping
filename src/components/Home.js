@@ -26,7 +26,7 @@ const Home = () => {
         })
       }
 
-    let initialLinks = [{
+    let links = [{
         coords: { lat: 37.233333, lng: -115.808333}, // required: latitude & longitude
         // at which to display the marker
         title: `Life, the Universe and Area 51`, // optional
@@ -38,8 +38,9 @@ const Home = () => {
         url: "https://en.wikipedia.org/wiki/Geographic_center_of_the_contiguous_United_States"
       }
     ]
-  
-    const [links, setLinks] = useState(initialLinks);
+
+    const [onMount, setOnMount] = useState({onMount: addMarkers(links)})
+    // debugger
 
     const mapOptions = {
         options: {
@@ -49,10 +50,7 @@ const Home = () => {
             },
             zoom: 4,
             disableDefaultUI: true
-        },
-        onMount: addMarkers(links),
-        links: links,
-        userPosition: {}
+        }
     }
 
     getMyLocation().then( myPosit => {
@@ -60,15 +58,16 @@ const Home = () => {
             coords: myPosit,
             title: "My Location",
         };
-        links.push(newLink)
-        setLinks( links );
+        links.push(newLink);
+        setOnMount({onMount: addMarkers(links)})
         console.log("Links now: ",links);
       })
 
+      // debugger
     return (
         <div>
             <h1>Google Maps</h1>
-            <Map {...mapOptions}
+            <Map {...mapOptions} onMount={onMount.onMount}
             />
             <p>{myText}</p>
         </div>
