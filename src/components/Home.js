@@ -50,7 +50,8 @@ const Home = () => {
             zoom: 4,
             disableDefaultUI: true
         },
-        onMount: addMarkers(links), 
+        onMount: addMarkers(links),
+        links: links,
         userPosition: {}
     }
 
