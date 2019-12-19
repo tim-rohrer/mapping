@@ -9,7 +9,7 @@ export default function Map({ options, onMount, className }) {
     const onLoad = () => {
       const map = new window.google.maps.Map(ref.current, options)
       if (typeof onMount === 'function') {
-        // debugger
+        debugger
         onMount(map)
       }
     }
@@ -23,9 +23,10 @@ export default function Map({ options, onMount, className }) {
       const headScript = document.getElementsByTagName('script')[0]
       headScript.parentNode.insertBefore(script, headScript)
       script.addEventListener('load', onLoad)
-      // debugger
+      // const map = new window.google.maps.Map(ref.current, options)
+      debugger
       return () => script.removeEventListener('load', onLoad)
-    } else onLoad()
+    } // else onLoad()
   }, [onMount, options])
 
   return (
