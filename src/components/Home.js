@@ -1,7 +1,8 @@
 import React, {useState} from 'react';
 import Map from './Map';
+import Button from './Button';
 
-import { getMyLocation } from '../assets/geolocation'
+// import { getMyLocation } from '../assets/geolocation'
 
 const Home = () => {
 
@@ -22,7 +23,6 @@ const Home = () => {
           marker.addListener(`click`, () => {
             window.location.href = link.url
           })
-        //   debugger
         })
       }
 
@@ -40,9 +40,8 @@ const Home = () => {
     ]
 
     const [onMount, setOnMount] = useState({onMount: addMarkers(links)})
-    // debugger
 
-    const mapOptions = {
+    const mapProps = {
         options: {
             center: {
                 lat: 39.833333, 
@@ -53,23 +52,39 @@ const Home = () => {
         }
     }
 
-    getMyLocation().then( myPosit => {
-        let newLink = {
-            coords: myPosit,
-            title: "My Location",
-        };
-        links.push(newLink);
+    const addDeming = () => {
+        const newLink = {
+            coords: { lat: 32.2686111, lng: -107.7580556},
+            title: "Deming, NM"
+        }
+        links.push(newLink)
         setOnMount({onMount: addMarkers(links)})
-        console.log("Links now: ",links);
-      })
+        console.log("Links now: ", links)
+    }
 
-      // debugger
+    // getMyLocation().then( myPosit => {
+    //     let newLink = {
+    //         coords: myPosit,
+    //         title: "My Location",
+    //     };
+    //     links.push(newLink);
+    //     setOnMount({onMount: addMarkers(links)})
+    //     console.log("Links now: ",links);
+    //   })
+
+    // const MemoMap = useCallback(<Map {...mapProps} {...onMount}/>, [])
+    
     return (
         <div>
-            <h1>Google Maps</h1>
-            <Map {...mapOptions} onMount={onMount.onMount}
-            />
+            <span>
+                <h1>Google Maps</h1>
+                <Button onClick={() => addDeming()}
+                    >Add Deming, NM</Button>
+            </span>
+
+            <Map {...mapProps} {...onMount}/>
             <p>{myText}</p>
+
         </div>
     )
 }
