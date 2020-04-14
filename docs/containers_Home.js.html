@@ -1,0 +1,271 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>JSDoc: containers/Home.js</title>
+
+    <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="./build/entry.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link href="https://fonts.googleapis.com/css?family=Muli:100,400,700|Oswald:300|Inconsolata,700" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+    <link type="text/css" rel="stylesheet" href="https://jmblog.github.io/color-themes-for-google-code-prettify/themes/tomorrow-night.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/app.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/iframe.css">
+</head>
+
+<body>
+    <div id="stickyNavbarOverlay"></div>
+    <div class="top-navbar">
+        <div class="container">
+            <nav class="navbar" role="navigation" aria-label="main navigation">
+                <div class="navbar-brand">
+                    
+                     
+                        <h1 class="navbar-item">Mapping Demo</h1>
+                    
+                    <a id="hamburger" role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+                        <span aria-hidden="true"></span>
+                        <span aria-hidden="true"></span>
+                        <span aria-hidden="true"></span>
+                    </a>
+                </div>
+                
+            </nav>
+        </div>
+    </div>
+    <div class="container">
+        <div class="columns">
+            <div class="column is-3" id="sidebarNav">
+                <div class="sidebar">
+                    <nav>
+                        <h2><a href="index.html">Home</a></h2><div class="category"><h3>Modules</h3><ul><li><a href="module-assets_googleMarkers.html">assets/googleMarkers</a></li><li><a href="module-assets_googleUtilities.html">assets/googleUtilities</a></li><li><a href="module-assets_utilities.html">assets/utilities</a></li><li><a href="module-ducks_placesGoogle.html">ducks/placesGoogle</a></li><li><a href="module-ducks_selectedTrip.html">ducks/selectedTrip</a></li><li><a href="module-ducks_trips.html">ducks/trips</a></li></ul><h3>Components</h3><ul><li><a href="InfoWindow.html">InfoWindow</a></li><li><a href="Map.html">Map</a></li></ul><h3>Global</h3><ul><li><a href="global.html#Home">Home</a></li></ul></div>
+                    </nav>
+                </div>
+            </div>
+            <div class="column is-9-desktop">
+                <div class="content" id="main-content-wrapper">
+                    <header class="page-title">
+                        <p>Source</p>
+                        <h1>containers/Home.js</h1>
+                    </header>
+                    
+                    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import React, { useState, useEffect } from 'react';
+import { useSelector, useStore, useDispatch } from 'react-redux'
+import Map from '../components/Map'
+import InfoWindow from '../components/InfoWindow'
+import Button from '../components/Button'
+import { assembleSelectedTripData, selectedTripIsShown } from '../ducks/selectedTrip'
+// import { fetchGoogleDetailsForPlaceId } from '../ducks/placesGoogle'
+import { mappingServiceRequested, mappingServiceSetupRequested } from '../ducks/appStatus'
+
+// import { getMyLocation } from '../assets/geolocation'
+
+/* eslint-disable react-hooks/exhaustive-deps */
+
+/**
+ * The home or main container for the app
+ *
+ */
+const Home = () => {
+
+    // Set up
+    const store = useStore()
+    const dispatch = useDispatch()
+    const mappingService = useSelector((state) => state.appStatus.appMappingService)
+    const isAppLoaded = useSelector((state) => state.appStatus.appLoaded)
+    // const places = useSelector((state) => state.placesGoogle.places)
+    const selectedTripIsLoaded = useSelector((state) => state.selectedTrip.selectedTripIsLoaded)
+    
+    const isGoogleReady = useSelector((state) => state.appStatus.mappingServicesAvailable.google)
+    // debugger
+    if (!isAppLoaded) dispatch(mappingServiceSetupRequested(mappingService))
+
+    // Placeholder data
+    let trip = {
+        orderedStops: ["ChIJK-0sC0Fl1oYRFccWTTgtw3M", "ChIJgdL4flSKrYcRnTpP0XQSojM" ],
+        end2: "ChIJGzE9DS1l44kRoOhiASS_fHg"
+    }
+    // let trip = {
+    //     startingPlaceId: "ChIJ0-ccjTakK4cR-kDBEmRpEoo",
+    //     endingPlaceId: "ChIJVcLdXTmoK4cRcS37k6k-MEo"
+    // }
+
+    /** @param {TripParameters) tripParameters */
+    const [tripParameters, setTripParameters ] = useState({
+        orderedStops: trip.orderedStops,
+        noStopsDesired: 3
+    })
+
+
+    // Accepts an array of locations and links, and the map, and places
+    // them on the map with a link to open additional information.
+    // const addMarkers = links => map => {
+    //     links.forEach((link, index) => {
+    //       const marker = new window.google.maps.Marker({
+    //         map,
+    //         position: link.coords,
+    //         label: `${index + 1}`,
+    //         title: link.title,
+    //       })
+    //       marker.addListener(`click`, () => {
+    //         window.location.href = link.url
+    //       })
+    //     })
+    //   }
+    
+
+    let links = [{
+        coords: { lat: 37.233333, lng: -115.808333}, // required: latitude &amp; longitude
+        // at which to display the marker
+        title: `Life, the Universe and Area 51`, // optional
+        url: `https://wikipedia.org/wiki/Area_51`, // optional
+      },
+      {
+        coords: { lat: 39.829840, lng: -98.579471},
+        title: "Center of US",
+        url: "https://en.wikipedia.org/wiki/Geographic_center_of_the_contiguous_United_States"
+      }
+    ]
+
+    const [mapProps, setMapProps] = useState({
+        options: {
+            center: {
+                lat: 39.833333, 
+                lng: -98.583333
+            },
+            zoom: 4,
+            disableDefaultUI: false
+        }
+    })
+
+    // getMyLocation().then( myPosit => {
+    //     const {options} = mapProps
+    //     let newLink = {
+    //         coords: myPosit,
+    //         title: "My Location",
+    //     };
+    //     links.push(newLink);
+    //     setMapProps({
+    //         options,
+    //         onMount: addMarkers(links)
+    //     })
+
+    //   })
+
+    const getMyState = () => {
+        console.log(store.getState())
+    }
+
+    const setMappingService = (service) => {
+        dispatch(mappingServiceRequested(service))
+    }
+
+    useEffect(() => {
+        console.log("Current mapping props: ",mapProps)
+        if (isGoogleReady &amp;&amp; mappingService === "google") {
+            let gMaps = window.google.maps
+            if (!selectedTripIsLoaded) {
+                dispatch(assembleSelectedTripData(tripParameters, gMaps))
+            } else { 
+                dispatch(selectedTripIsShown())
+            }
+
+            // Make sure our trip stops have details loaded
+            // const {orderedStops} = tripParameters
+            // orderedStops.forEach((stopId) => {
+            //     if (places[stopId] === undefined) {
+            //         dispatch(fetchGoogleDetailsForPlaceId(stopId, gMaps))
+            //     }
+            // })
+        } 
+
+        // let needMarkers = (markerPoints !== undefined) &amp;&amp; (markerPoints.length > 0)
+        // if (isAppLoaded &amp;&amp; needMarkers) {
+        //     let myMarkers = createArrayOfMarkers(markerPoints, gMaps)
+        //     console.log("Markers: ", myMarkers)
+        // }
+    },[dispatch, tripParameters, isGoogleReady, mappingService, selectedTripIsLoaded])
+
+    let list = [
+        {service: "google"},
+        {service: "mapbox"}
+    ] 
+
+    const [showDropdown, setShowDropdown] = useState(false)
+
+    const toggleDropdown = () => {
+        setShowDropdown(!showDropdown)
+    }
+    // const MemoMap = useCallback(&lt;Map {...mapProps} {...onMount}/>, [])
+    // debugger
+    return (
+        &lt;div>
+            &lt;h1 className="App">Mapping Demo&lt;/h1>
+            &lt;div className="menu-bar">
+                &lt;span>
+                    &lt;Button onClick={() => toggleDropdown()}
+                        >Mapping Service&lt;/Button>
+                        { showDropdown &amp;&amp; 
+                            list.map(item => 
+                                &lt;div key={item.service}>
+                                    &lt;Button onClick={() => setMappingService(item.service)}>{item.service}&lt;/Button>
+                                &lt;/div>
+                            )
+                        }
+                    &lt;Button onClick={() => getMyState()}
+                       >Log Current State&lt;/Button>
+                    &lt;InfoWindow {...tripParameters} />
+                &lt;/span>
+            &lt;/div>
+            { isAppLoaded 
+            ? 
+            &lt;Map {...mapProps}/>
+            : &lt;div> NOOOOOOOOPE &lt;/div>
+            }
+        &lt;/div>
+    )
+}
+
+export default Home;</code></pre>
+        </article>
+    </section>
+
+
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+<footer class="footer">
+    <div class="content has-text-centered">
+        <p>Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.3</a> on Fri Feb 07 2020 20:49:15 GMT+0000 (Coordinated Universal Time)</p>
+        <p class="sidebar-created-by">
+            <a href="https://github.com/SoftwareBrothers/better-docs" target="_blank">BetterDocs theme</a> provided with <i class="fas fa-heart"></i> by 
+            <a href="http://softwarebrothers.co" target="_blank">SoftwareBrothers - JavaScript Development Agency</a>
+        </p>
+    </div>
+</footer>
+
+
+<script src="scripts/app.min.js"></script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

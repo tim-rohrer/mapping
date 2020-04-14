@@ -1,3 +1,11 @@
+## Features
+* [ ] Display trip
+* [ ] Edit trip
+* [ ] Select route
+* [ ] User authentication
+
+##
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts

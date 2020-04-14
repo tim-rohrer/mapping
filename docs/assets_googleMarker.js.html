@@ -1,0 +1,278 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>JSDoc: assets/googleMarker.js</title>
+
+    <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="./build/entry.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link href="https://fonts.googleapis.com/css?family=Muli:100,400,700|Oswald:300|Inconsolata,700" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+    <link type="text/css" rel="stylesheet" href="https://jmblog.github.io/color-themes-for-google-code-prettify/themes/tomorrow-night.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/app.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/iframe.css">
+</head>
+
+<body>
+    <div id="stickyNavbarOverlay"></div>
+    <div class="top-navbar">
+        <div class="container">
+            <nav class="navbar" role="navigation" aria-label="main navigation">
+                <div class="navbar-brand">
+                    
+                     
+                        <h1 class="navbar-item">Mapping Demo</h1>
+                    
+                    <a id="hamburger" role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+                        <span aria-hidden="true"></span>
+                        <span aria-hidden="true"></span>
+                        <span aria-hidden="true"></span>
+                    </a>
+                </div>
+                
+            </nav>
+        </div>
+    </div>
+    <div class="container">
+        <div class="columns">
+            <div class="column is-3" id="sidebarNav">
+                <div class="sidebar">
+                    <nav>
+                        <h2><a href="index.html">Home</a></h2><div class="category"><h3>Modules</h3><ul><li><a href="module-assets_googleMarkers.html">assets/googleMarkers</a></li><li><a href="module-assets_googleUtilities.html">assets/googleUtilities</a></li><li><a href="module-assets_stopSolverCore.html">assets/stopSolverCore</a></li><li><a href="module-assets_utilities.html">assets/utilities</a></li><li><a href="module-ducks_placesGoogle.html">ducks/placesGoogle</a></li><li><a href="module-ducks_selectedTrip.html">ducks/selectedTrip</a></li><li><a href="module-ducks_stopSolver.html">ducks/stopSolver</a></li><li><a href="module-ducks_trips.html">ducks/trips</a></li></ul><h3>Components</h3><ul><li><a href="InfoWindow.html">InfoWindow</a></li><li><a href="Map.html">Map</a></li></ul><h3>Global</h3><ul><li><a href="global.html#Home">Home</a></li></ul></div>
+                    </nav>
+                </div>
+            </div>
+            <div class="column is-9-desktop">
+                <div class="content" id="main-content-wrapper">
+                    <header class="page-title">
+                        <p>Source</p>
+                        <h1>assets/googleMarker.js</h1>
+                    </header>
+                    
+                    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import { getPlaceTypeConstantGivenAType } from './placeTypes';
+// import { markerTypes } from './mapHelperUtilities';
+
+/**
+ * Google Markers
+ * @module assets/googleMarkers
+ * @author James Crain
+ * @author Tim Rohrer (@tim_rohrer)
+ * 
+ * @desc These functions are specific to generating markers for use on 
+ * a Google map. 
+ */
+
+/* eslint-disable no-undef */
+
+/*  Summary:
+    Constant list of our marker types. Used for distinguishing
+    what type of map marker was acted, or need to be acted, upon.
+*/
+export const markerTypes = {
+    tripStop: 'tripStop',
+    stopSolver: 'stopSolver',
+    stopSolverOvernight: 'stopSolverOvernight',
+    searchResult: 'searchResult',
+    tripStopPOI: 'tripStopPOI'
+}
+let requireImagePrefix = "";
+let devicePixelRatio = (window.devicePixelRatio === undefined ? 1 : window.devicePixelRatio);
+
+// Currently no 3x support.
+// if(devicePixelRatio > 2) {
+//   requireImagePrefix = "@3x";
+// }
+// else if(devicePixelRatio > 1) {
+//   requireImagePrefix = "@2x";
+// }
+
+if (devicePixelRatio > 1) {
+    requireImagePrefix = "@2x";
+}
+
+function getMapMarkerType(type, label) {
+    if (type === "starting") {
+        return "start";
+    }
+    else if (type === "stopping") {
+        return "stop";
+    }
+    else if (type === "stopSolverIcon") {
+        return "stopSolverIcon"
+    }
+    else if (type === "regular") {
+        // This is really the Trip Stop number.
+        return label;
+    }
+    else {
+        let _placeType = getPlaceTypeConstantGivenAType(type)
+        return _placeType.mapMarkerImageName;
+    }
+}
+
+function getMarkerIcon(type, markerType, label) {
+
+    let iconSize = new google.maps.Size(30, 59)
+    let anchorPoint = null
+
+    if (type === "starting" || type === "stopping") {
+        iconSize = new google.maps.Size(49, 36)
+    }
+
+    var urlPrefix = "/images/"
+    if (markerType === markerTypes.stopSolver) {
+        urlPrefix += "ss_"
+    }
+    else if (markerType === markerTypes.tripStopPOI) {
+        urlPrefix += "ts_"
+    }
+    else if (markerType === markerTypes.tripStop) {
+        urlPrefix += "ts/ts_"
+    }
+    else if (markerType === markerTypes.stopSolverOvernight) {
+        requireImagePrefix = ""
+        iconSize = new google.maps.Size(33, 32.5)
+        anchorPoint = new google.maps.Point(16,16)
+    }
+
+    let _url = urlPrefix + getMapMarkerType(type, label) + requireImagePrefix + ".png"
+
+    return {
+        url: _url,
+        size: iconSize,
+        scaledSize: iconSize,
+        anchor: anchorPoint
+    };
+}
+
+/** 
+ *      let pinIcon = {
+            url: "/images/stopSolverIcon.png",
+            size: new google.maps.Size(33, 32.5),
+            scaledSize: new google.maps.Size(33, 32.5),
+            anchor: new google.maps.Point(16, 16)
+        }
+ */
+
+export function getTripStopMarkerIconFromUrl(tripStopLabelShouldBe) {
+
+    var iconSize = new google.maps.Size(30, 59);
+    if (tripStopLabelShouldBe === "start" || tripStopLabelShouldBe === "stop") {
+        iconSize = new google.maps.Size(49, 36);
+    }
+
+    // var cleansedTripStopLabel = tripStopNumberMinusOne;
+    // if (tripStopNumberMinusOne === 0) {
+    //     cleansedTripStopLabel = "start";
+    // }
+    // else if (isDestination) {
+    //     cleansedTripStopLabel = "stop";
+    // }
+
+    let urlPrefix = "/images/ts/ts_";
+    let _url = urlPrefix + tripStopLabelShouldBe + requireImagePrefix + ".png";
+
+    return {
+        url: _url,
+        size: iconSize,
+        scaledSize: iconSize
+    };
+}
+
+/** @deprecated */
+export function getCustomGoogleMapMarker(position, map, type, placeId, markerType, label) {
+
+    let markerIcon = getMarkerIcon(type, markerType, label);
+
+    var marker = new google.maps.Marker({
+        position: position,
+        map: map,
+        icon: markerIcon,
+        optimized: false,
+        draggable: false
+    });
+
+    if (placeId) {
+        let place = {
+            location: position,
+            placeId: placeId
+        }
+        marker.setPlace(place);
+    }
+
+    return marker;
+
+}
+
+export /**
+ * Returns a unbounded Google marker with custom icon based on selected parameters.
+ * If placeId is defined, will associate place information.
+ *
+ * @param {Object} latlngPosition - LatLng Literal
+ * @param {String} type - ??? This doesn't work for me
+ * @param {String} placeId - Google placeId
+ * @param {Const} markerType - One of the marker type constants
+ * @param {String} label - ???
+ */
+const createUnboundedCustomGoogleMarker = (latlngPosition, type, placeId, markerType, label) => {
+
+    let markerIcon = getMarkerIcon(type, markerType, label)
+
+    let marker = new window.google.maps.Marker({
+        position: latlngPosition,
+        icon: markerIcon,
+        optimized: false,
+        draggable: false
+    })
+
+    if (placeId) {
+        let place = {
+            location: latlngPosition,
+            placeId: placeId
+        }
+        marker.setPlace(place)
+    }
+    return marker
+}</code></pre>
+        </article>
+    </section>
+
+
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+<footer class="footer">
+    <div class="content has-text-centered">
+        <p>Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.3</a> on Sun Feb 09 2020 16:08:13 GMT+0000 (Coordinated Universal Time)</p>
+        <p class="sidebar-created-by">
+            <a href="https://github.com/SoftwareBrothers/better-docs" target="_blank">BetterDocs theme</a> provided with <i class="fas fa-heart"></i> by 
+            <a href="http://softwarebrothers.co" target="_blank">SoftwareBrothers - JavaScript Development Agency</a>
+        </p>
+    </div>
+</footer>
+
+
+<script src="scripts/app.min.js"></script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>

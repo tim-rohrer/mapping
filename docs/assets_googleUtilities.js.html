@@ -1,0 +1,515 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>JSDoc: assets/googleUtilities.js</title>
+
+    <script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="./build/entry.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link href="https://fonts.googleapis.com/css?family=Muli:100,400,700|Oswald:300|Inconsolata,700" rel="stylesheet">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css" integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
+    <link type="text/css" rel="stylesheet" href="https://jmblog.github.io/color-themes-for-google-code-prettify/themes/tomorrow-night.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/app.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/iframe.css">
+</head>
+
+<body>
+    <div id="stickyNavbarOverlay"></div>
+    <div class="top-navbar">
+        <div class="container">
+            <nav class="navbar" role="navigation" aria-label="main navigation">
+                <div class="navbar-brand">
+                    
+                     
+                        <h1 class="navbar-item">Mapping Demo</h1>
+                    
+                    <a id="hamburger" role="button" class="navbar-burger" aria-label="menu" aria-expanded="false">
+                        <span aria-hidden="true"></span>
+                        <span aria-hidden="true"></span>
+                        <span aria-hidden="true"></span>
+                    </a>
+                </div>
+                
+            </nav>
+        </div>
+    </div>
+    <div class="container">
+        <div class="columns">
+            <div class="column is-3" id="sidebarNav">
+                <div class="sidebar">
+                    <nav>
+                        <h2><a href="index.html">Home</a></h2><div class="category"><h3>Modules</h3><ul><li><a href="module-assets_googleMarkers.html">assets/googleMarkers</a></li><li><a href="module-assets_googleUtilities.html">assets/googleUtilities</a></li><li><a href="module-assets_stopSolverCore.html">assets/stopSolverCore</a></li><li><a href="module-assets_utilities.html">assets/utilities</a></li><li><a href="module-ducks_placesGoogle.html">ducks/placesGoogle</a></li><li><a href="module-ducks_selectedTrip.html">ducks/selectedTrip</a></li><li><a href="module-ducks_stopSolver.html">ducks/stopSolver</a></li><li><a href="module-ducks_trips.html">ducks/trips</a></li></ul><h3>Components</h3><ul><li><a href="InfoWindow.html">InfoWindow</a></li><li><a href="Map.html">Map</a></li></ul><h3>Global</h3><ul><li><a href="global.html#Home">Home</a></li></ul></div>
+                    </nav>
+                </div>
+            </div>
+            <div class="column is-9-desktop">
+                <div class="content" id="main-content-wrapper">
+                    <header class="page-title">
+                        <p>Source</p>
+                        <h1>assets/googleUtilities.js</h1>
+                    </header>
+                    
+                    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>import { createUnboundedCustomGoogleMarker, markerTypes } from './googleMarker' // need to move markerTypes
+
+/**
+ * Google Utilities
+ * @module assets/googleUtilities
+ * @author Tim Rohrer (@tim_rohrer)
+ * 
+ * @desc These utility functions generally depend upon Google services or the map object.
+ * In some cases, they are used to remove the Google dependency so generic functions can be
+ * invoked.
+ * 
+ */
+
+export /**
+ * Provides the options necessary to create markers for route and stop solver positions, determined 
+ * in kilometers, along each provided route
+ *
+ * @param {Number} noStopsDesired - Integer representing the number of stops the user has requested
+ * @param {Array} tripRoutesInfo - Array of positions, at approximately every kilometer, along 
+ * Google's calculated routes for the selected trip.
+ * @returns {Array} stopSolverMarkersByRoute - Array for routes' stop solver markers
+ */
+const generateRouteAndStopSolverMarkerPoints = (noStopsDesired, routeDistanceArray, tripRoutesInfo) => {
+    let kilometersPerDay = 0
+    let stopSolverMarkersByRoute = []
+    routeDistanceArray.forEach( (routeDistance, routeDistanceIndx) => {
+        kilometersPerDay = Math.round( routeDistance.value / noStopsDesired / 1000 )
+        // let positInfo = tripRoutesInfo[routeDistanceIndx]['startingPt']
+        // let stopSolverPosits = [{
+        //     positInfo: positInfo,
+        //     marker: createUnboundedSimpleGoogleMarker(positInfo.posit)
+        // }]
+        let aRoutesMarkers = [createUnboundedCustomGoogleMarker(tripRoutesInfo[routeDistanceIndx]['startingPt'].posit, 'starting', null, markerTypes.tripStop, "Beats Me!" )]
+        // window.google.maps.event.addListener(aRoutesMarkers[0], 'click', function() {
+        //     alert("here!")
+        // })
+        for (let i=1; i &lt; noStopsDesired;  i++) {
+            let distanceRef = kilometersPerDay * i
+            // positInfo = tripRoutesInfo[routeDistanceIndx][distanceRef]
+            // stopSolverPosits.push({
+            //     positInfo: positInfo,
+            //     marker: createUnboundedSimpleGoogleMarker(positInfo.posit)
+            // })
+            aRoutesMarkers.push(createUnboundedCustomGoogleMarker(tripRoutesInfo[routeDistanceIndx][distanceRef].posit, 'stopSolverIcon', null, markerTypes.stopSolverOvernight, i.toString()))
+        }
+        // positInfo = tripRoutesInfo[routeDistanceIndx]['endingPt']
+        // stopSolverPosits.push({
+        //     positInfo: positInfo,
+        //     marker: createUnboundedSimpleGoogleMarker(tripRoutesInfo[routeDistanceIndx]['endingPt'].posit)
+        // })
+        aRoutesMarkers.push(createUnboundedCustomGoogleMarker(tripRoutesInfo[routeDistanceIndx]['endingPt'].posit, 'stopping', null, markerTypes.tripStop, "An Ending!"))
+        stopSolverMarkersByRoute.push(aRoutesMarkers)
+    })
+    return stopSolverMarkersByRoute
+}
+
+// const googleMapsClient = require('@google/maps').createClient({
+//     key: 
+// });
+
+// export const myPlacesService = () => {
+//     return googleMapsClient.place();
+
+//     // const mapDiv = document.createElement('div');
+//     // console.log(window.google);
+//     // let pS = new window.google.maps(mapDiv);
+//     // console.log(JSON.stringify(new window.google.maps.places.PlacesService(document.createElement('div'))));
+//     // return new window.google.maps.places.PlacesService(document.createElement('div'));
+// }
+
+
+
+
+export /**
+ * Animate the provided route.
+ *
+ * @param {object} map - A Google Map.
+ * @param {Array} pathCoords - A set of latlng literals to animate
+ * CURRENTLY UNUSED
+ */
+const animateGoogleRoute = (map, pathCoords) => {
+    let i, route, marker, plotLat, plotLng;
+    const icon = new window.google.maps.MarkerImage("http://maps.google.com/mapfiles/ms/micons/blue.png");
+    // Callback for setTimeout
+    const addPathLineAndUpateMarker = (coords) => {
+        plotLat = coords.lat
+        plotLng = coords.lng
+        route.getPath().push(new window.google.maps.LatLng(plotLat, plotLng));
+        moveMarker(map, marker, plotLat, plotLng);
+    }
+
+    route = new window.google.maps.Polyline({
+        path: [],
+        geodesic : true,
+        strokeColor: '#FF0000',
+        strokeOpacity: 1.0,
+        strokeWeight: 2,
+        editable: false,
+        map:map
+    });
+    marker=new window.google.maps.Marker({map:map, icon:icon});
+
+    for (i = 0; i &lt; pathCoords.length; i++) {
+        setTimeout(addPathLineAndUpateMarker, 1 * i, pathCoords[i]);
+    }
+}
+
+export /**
+ * Extracts all lat/lng points from the Google Route 
+ *
+ * @param {Object} result - A Google DirectionsResult Object
+ * @return {Array} routesPoints - All the latlng points for each route
+ * @see {@link googleUtilities#extractOverviewPathFromGoogleRoutes}
+ */
+const extractAllRoutePointsFromGoogleRoutes = (result) => {
+    let routes = result.routes
+    let routesPoints = []
+    routes.forEach((route, routeIndx) => {
+        routesPoints[routeIndx] = []
+        // Each route may be comprised of multiple legs
+        let legs = route.legs
+        legs.forEach((leg, legIndx) => {
+            // Each leg is comprised of steps
+            let steps = leg.steps
+            steps.forEach((step, stepIndx) => {
+                // Each step includes an array of latlng object functions. These are where we pull our points from
+                let lat_lngs = step.lat_lngs
+                lat_lngs.forEach((lat_lng, lat_lngIndx) => {
+                    let coordPoint = {lat: lat_lng.lat(), lng: lat_lng.lng()}
+                    routesPoints[routeIndx].push(coordPoint)
+                })
+            })
+        })
+        // return routesPoints
+    })
+    return routesPoints // An array for each route, consisting of all latlng points along that route.
+}
+
+export /**
+ * Extracts lat/lng points from the Google DirectionsResult's overview_path
+ *
+ * @param {Object} result - A Google DirectionsResult Object
+ * @returns {Array} routesPoints - The latlng point for each route's overview path
+ * @see {@link googleUtilities#extractAllRoutePointsFromGoogleRoutes}
+ */
+const extractOverviewPathFromGoogleRoutes = (result) => {
+    let routes = result.routes
+    let routesPoints = []
+    routes.forEach((route, routeIndx) => {
+        // routesPoints[routeIndx] = []
+        let overviewPath = route.overview_path
+        // Each route has an overview path which includes an array of latlng object functions. These are where we pull our points from
+        overviewPath.forEach((point, pointIndx) => {
+            let coordPoint = {lat: point.lat(), lng: point.lng()}
+            routesPoints[routeIndx].push(coordPoint)
+        })
+    })
+    return routesPoints // An array for each route, consisting of all latlng points along that route.
+}
+
+export /**
+ * Repositions the existing marker based on the lat/lng.
+ * 
+ * @function
+ * @param {object} map - A Google Map.
+ * @param {object} marker - Google Map marker.
+ * @param {number} lat - A decimal number corresponding to the new latitude.
+ * @param {number} lon - A decimal number corresponding to the new longitude.
+ */
+const moveMarker = (map, marker, lat, lon) => {
+    marker.setPosition(new window.google.maps.LatLng(lat, lon));
+    // map.panTo(new window.google.maps.LatLng(lat, lon));
+}
+
+/** Section: XX
+ * Title: Fetches. 
+ * 
+ * Description: These asynchronous functionss obtain data from the various Google services 
+ * 
+ * 
+ */
+
+ /**
+ * Fetches a distance matrix from Google using a client-side map object
+ *  and their Distance Matrix Service.
+ * 
+ * Requires an instance of Google's Distance Matrix Service and a 
+ *  trip object. 
+ * 
+ * For this function, the trip object must include "startingPlaceId"
+ *  and "endingPlaceId".
+ * CURRENTLY UNUSED
+ */
+export const fetchGoogleDistanceAndTimeBetweenTwoPlaceIds = (distanceMatrixService, trip ) => {
+    const {startingPlaceId, endingPlaceId} = trip
+    return new Promise( (resolve, reject) => {
+        distanceMatrixService.getDistanceMatrix({
+            origins: [{placeId: startingPlaceId}],
+            destinations: [{placeId: endingPlaceId}],
+            travelMode: 'DRIVING'
+        }, 
+        (response, status) => {
+            if (status !== 'OK') {
+                reject(status)
+            } else {
+                resolve(response)
+            }
+        })
+    })
+};
+
+export /**
+ * Fetches available routes determined by Google using a cliend-side map object 
+ * and their Directions service.
+ *
+ * @param {Object} directionsService - Google's Directions service.
+ * @param {PlaceId} startingPlaceId - Google's PlaceId that serves as the starting place.
+ * @param {PlaceId} endingPlaceId - Google's PlaceId that serves as the ending place.
+ * @return {Promise&lt;Object>} - Resolves with Google DirectionsResult object.
+ * @resolve {Object}
+ * @reject {string}
+ */
+const fetchGoogleRoutes = (directionsService, startingPlaceId, endingPlaceId) => {
+    return new Promise( (resolve, reject) => {
+        directionsService.route(
+            {
+                origin: {placeId: startingPlaceId},
+                destination: {placeId: endingPlaceId},
+                travelMode: 'DRIVING',
+                // transitOptions: TransitOptions,
+                // drivingOptions: DrivingOptions,
+                unitSystem: window.google.maps.UnitSystem.METRIC,
+                // waypoints: [{location: "San Antonio, TX"}],
+                // optimizeWaypoints: Boolean,
+                provideRouteAlternatives: false,
+                // avoidFerries: Boolean,
+                // avoidHighways: Boolean,
+                // avoidTolls: Boolean,
+                // region: String
+            },
+            (result, status) => {
+            if (status === 'OK') {
+                console.log("DirectionsResult Object: ", result)
+                resolve(result)
+            } 
+                else {
+                    reject(status)
+                }
+            }
+        )
+    })
+}
+
+/**
+ * 
+ * 
+ * Requires the map object, and both the Directions Service and Renderer. The trip object
+ * must contain the Google PlaceIds as startingPlaceId and endingPlaceId. 
+ * 
+ * For now, the travelMode is set to 'DRIVING'.
+ * Alternative routes are provided. 
+ */
+export /**
+ * Displays the default route between the starting and ending locations for the trip.
+ *
+ * @param {*} map
+ * @param {*} directionsService
+ * @param {*} directionsRenderer
+ * @param {*} trip
+ * @deprecated
+ */
+const calculateAndDisplayRoute = (map, directionsService, directionsRenderer, trip) => {
+    const {startingPlaceId, endingPlaceId} = trip
+    directionsService.route(
+        {
+            origin: {placeId: startingPlaceId},
+            destination: {placeId: endingPlaceId},
+            travelMode: 'DRIVING',
+            // transitOptions: TransitOptions,
+            // drivingOptions: DrivingOptions,
+            // unitSystem: UnitSystem,
+            // waypoints: [{location: "San Antonio, TX"}],
+            // optimizeWaypoints: Boolean,
+            provideRouteAlternatives: true,
+            // avoidFerries: Boolean,
+            // avoidHighways: Boolean,
+            // avoidTolls: Boolean,
+            // region: String
+        },
+        (result, status) => {
+          if (status === 'OK') {
+            directionsRenderer.setDirections(result);
+            // autoRefresh(map, result.routes[0].overview_path)
+
+            // console.log("The directions: ", response)
+          } else {
+            window.alert('Directions request failed due to ' + status);
+          }
+        });
+  }
+
+export /**
+ * Fetches selected fields of Google details for a designated place
+ *
+ * @param {string} placeId - Google's PlaceId
+ * @param {*} resolve - The Promise resolve function
+ * @param {*} reject - The Promise reject function
+ */
+const fetchGoogleDetailsForPlaceId = (placeId, resolve, reject) => {
+        let placesService = new window.google.maps.places.PlacesService(document.createElement('div'))
+        placesService.getDetails({
+            placeId: placeId,
+            fields: ['address_component', 'adr_address', 'formatted_address', 'geometry', 'icon', 'name', 'permanently_closed', 'photo', 'place_id', 'plus_code', 'type', 'url', 'vicinity']
+        }, (placeDetails, status) => {
+            if (status === 'OK') {
+                resolve(placeDetails)
+            } else {
+                reject(status)
+            }
+        })
+    // })
+}
+
+export /**
+ * Calculates route distance and duration using Google's previously calculated
+ * directions (steps)
+ *
+ * @param {Array} steps - Google's route directions/steps
+ * @returns {Array} totals - Contains the sum distance and time
+ * 
+ * @deprecated
+ */
+const sumGoogleDistanceAndDurationFromRouteSteps = (steps) => {
+    let totalDistance = 0
+    let totalDuration = 0
+    steps.forEach((step, indx) => {
+        totalDistance += step.distance.value
+        totalDuration += step.duration.value
+    })
+    let totals = [totalDistance, totalDuration]
+    return totals
+}
+
+/**
+ * Function: determineCoordsForStopSolverWayPointsGoogle
+ * @deprecated
+ */
+export const determineCoordsForStopSolverWayPointsGoogle = (directions, kilometersPerDay) => {
+    let stepStartCoordsArray = []
+    directions.forEach((step, indx) => {
+        console.log(indx)
+        let stepStartCoords = {lat: step.start_location.lat(), lng: step.start_location.lng()}
+        let associatedLatLngs = step.lat_lngs
+        associatedLatLngs.forEach((x, i) => {
+            console.log(i,"----- ", x.lat(),", ",x.lng())
+        })
+        stepStartCoordsArray.push(stepStartCoords)
+        console.log(stepStartCoords, step)
+        debugger
+        // console.log("Start Loc: ",step.start_location.lat()," ", step.start_location.lng())
+        // console.log("Start Pt: ", step.start_point.lat()," ", step.start_point.lng())
+        // console.log("End Loc: ", step.end_location.lat(), " ", step.end_location.lng())
+        // console.log("End Pt: ", step.end_point.lat(), " ", step.end_point.lng())
+    })
+    console.log("Array of step coords: ", stepStartCoordsArray)
+}
+
+// export const fetchGoogleDetailsForPlaceId = (placeId, resolve, reject) => {
+//     let placesService = myPlacesService();
+//     placesService.getDetails({ placeId: placeId }, function (placeDetails, status) {
+//         if (status === 'OK') {
+//             let googlePlaceDetails = {
+//                 key: placeId,
+//                 object: {
+//                     placeId: placeId,
+//                     name: placeDetails.name,
+//                     address: placeDetails.formatted_address,
+//                     phone: "",
+//                     website: "",
+//                     email: null,
+//                     types: placeDetails.types,
+//                     photos: placeDetails.photos,
+//                     photo: "",
+//                     geometry: placeDetails.geometry,
+//                     position: "",
+//                     reviews: placeDetails.reviews
+//                 }
+//             }
+
+//             if (placeDetails.formatted_phone_number) {
+//                 googlePlaceDetails.object.phone = placeDetails.formatted_phone_number
+//             };
+            
+//             if (placeDetails.email) {
+//                 googlePlaceDetails.object.email = placeDetails.email
+//             }
+            
+//             if (placeDetails.website) {
+//                 googlePlaceDetails.object.website = placeDetails.website
+//             }
+
+//             if (placeDetails.geometry.location.lat) {
+//                 googlePlaceDetails.object.position = {
+//                     lat: placeDetails.geometry.location.lat(), 
+//                     lng: placeDetails.geometry.location.lng()
+//                 };
+//             };
+
+//             // [TGR_2/5/2019]: TODO: Make this random photo vice first
+//             let photoUrl = '';
+//             if (typeof placeDetails.photos !== 'undefined') {
+//                 photoUrl = placeDetails.photos[0].getUrl({ maxWidth: 200, maxHeight: 200 });
+//             };
+//             googlePlaceDetails.object.photo = photoUrl;
+//             resolve(googlePlaceDetails);
+//         } else {
+//             // debugger;
+//             // alert('No Details Available for the PlaceId');
+//             // reject(status);
+//         };
+//     }) // end getDetails */
+// }</code></pre>
+        </article>
+    </section>
+
+
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+<footer class="footer">
+    <div class="content has-text-centered">
+        <p>Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.3</a> on Sun Feb 09 2020 16:08:13 GMT+0000 (Coordinated Universal Time)</p>
+        <p class="sidebar-created-by">
+            <a href="https://github.com/SoftwareBrothers/better-docs" target="_blank">BetterDocs theme</a> provided with <i class="fas fa-heart"></i> by 
+            <a href="http://softwarebrothers.co" target="_blank">SoftwareBrothers - JavaScript Development Agency</a>
+        </p>
+    </div>
+</footer>
+
+
+<script src="scripts/app.min.js"></script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
